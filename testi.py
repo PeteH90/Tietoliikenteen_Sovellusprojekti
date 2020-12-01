@@ -1,20 +1,24 @@
-'import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 import ssl
 import mysql.connector as mariadb
 
-mariadb_connection = mariadb.connect(user='testi1', password='!Anturidata123', database='anturidata')
+mariadb_connection = mariadb.connect(user='testi1', password='!Anturidata123', database='cabin_monitor')
 cursor = mariadb_connection.cursor()
 
 # MQTT Settings
 MQTT_Broker = "mqtt.eclipse.org"
 MQTT_Port = 1883
 Keep_Alive_Interval = 60
-MQTT_Topic = ["kosteus1", "lampotila1", "ilmanpaine1"]
+MQTT_Topic = ["paavo_cabin_temperature_inside", "paavo_cabin_temperature_outside", "paavo_cabin_humidity_inside", "paavo_cabin_humidity_outside", "paavo_cabin_airpressure", "paavo_cabin_message"]
 
 # Subscribe
 def on_connect(client, userdata, flags, rc):
   mqttc.subscribe(MQTT_Topic[0], 0)
   mqttc.subscribe(MQTT_Topic[1], 0)
+  mqttc.subscribe(MQTT_Topic[2], 0)
+  mqttc.subscribe(MQTT_Topic[3], 0)
+  mqttc.subscribe(MQTT_Topic[4], 0)
+  mqttc.subscribe(MQTT_Topic[5], 0)
 
 
 def on_message(mosq, obj, msg):
@@ -28,15 +32,21 @@ def on_message(mosq, obj, msg):
   leikkaus2 = msg_clear[1:]
 
   if leikkaus == '0':
-    muuttuja = "Lampotila"
+    muuttuja = "temperature_inside"
   elif leikkaus == '1':
-    muuttuja = "Kosteus"
+    muuttuja = "temperature_outside"
   elif leikkaus == '2':
-    muuttuja = "Ilmanpaine"
-  print(muuttuja)
+    muuttuja = "humidity_inside"
+  elif leikkaus == '3':
+    muuttuja = "humidity_outside"
+  elif leikkaus == '4':
+    muuttuja = "air_pressure"
+  elif leikkaus == '5':
+    muuttuja = "messages"
+
 #  Prepare sql statement
 
-  sql = "INSERT INTO %s VALUES (NULL, %s )" % (muuttuja, leikkaus2)
+  sql = "INSERT INTO %s VALUES (NULL, %s, NOW(), 1)" % (muuttuja, leikkaus2)
 
 # Save Data into DB Table
   try:
