@@ -3,6 +3,11 @@ from datetime import datetime
 import time
 from picamera import PiCamera
 import paho.mqtt.client as mqtt
+import cv2 
+import imutils 
+
+hog = cv2.HOGDescriptor() 
+hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 GPIO.cleanup()
 GPIO.setwarnings(False)
@@ -16,12 +21,15 @@ log_f.close()
 camera = PiCamera()
 pic_name = 0
 
-viesti = "movement detected"
+
+viesti1 = "'human detected'"
+viesti2 = "'movement detected'"
 #camera.start_preview()
-time.sleep(2)
+time.sleep(60)
 
 while True:
     i=GPIO.input(11)
+    regions = 0
     if i==0: #When output from motion sensor is LOW
         if counter > 50:
             end = str(datetime.now())
@@ -33,11 +41,28 @@ while True:
             final = '/home/pi/kuvat/kuva' + str(pic_name) + ".jpg"
             pic_name = pic_name + 1
             camera.capture(final)
-            broker_address="mqtt.eclipse.org"
-            client = mqtt.Client("P1")
-            client.connect(broker_address)
-            client.publish("paavo_cabin_message","5"+viesti)
+            image = cv2.imread('/home/pi/kuvat/kuvaa3.jpg')
+            image = imutils.resize(image, 
+                       width=min(400, image.shape[1]))
+            (regions, _) = hog.detectMultiScale(image,  
+                                    winStride=(4, 4), 
+                                    padding=(4, 4), 
+                                    scale=1.05)
+            pituus = str(len(regions))
+            if len(regions) > 0:
+                #broker_address="broker.hivemq.com"
+                #client = mqtt.Client("P1")
+                #client.connect(broker_address)
+                #client.publish("paavo_cabin_message","5"+pituus+viesti1)
+                print("5"+pituus+viesti1)
+            else:
+                #broker_address="broker.hivemq.com"
+                #client = mqtt.Client("P1")
+                #client.connect(broker_address)
+                #client.publish("paavo_cabin_message","5"+viesti2)
+                print("!")
         counter = 0
+        cv2.destroyAllWindows() 
         print("No intruders",i)
         time.sleep(0.1)
         
