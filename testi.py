@@ -6,7 +6,7 @@ mariadb_connection = mariadb.connect(user='testi1', password='!Anturidata123', d
 cursor = mariadb_connection.cursor()
 
 # MQTT Settings
-MQTT_Broker = "mqtt.eclipse.org"
+MQTT_Broker = "broker.hivemq.com"
 MQTT_Port = 1883
 Keep_Alive_Interval = 60
 MQTT_Topic = ["paavo_cabin_temperature_inside", "paavo_cabin_temperature_outside", "paavo_cabin_humidity_inside", "paavo_cabin_humidity_outside", "paavo_cabin_airpressure", "paavo_cabin_message"]
@@ -42,7 +42,7 @@ def on_message(mosq, obj, msg):
   elif leikkaus == '4':
     muuttuja = "air_pressure"
   elif leikkaus == '5':
-    muuttuja = "messages"
+    muuttuja = "message"
 
 #  Prepare sql statement
 
@@ -55,6 +55,24 @@ def on_message(mosq, obj, msg):
       print("Error: {}".format(error))
   mariadb_connection.commit()
 
+  if leikkaus == '5':
+    Q1 = "select id_message from message order by id_message desc LIMIT 1"
+
+    cursor.execute(Q1)
+    Q1 = cursor.fetchall()
+    for row in Q1:
+      Q01 = row[0]
+      
+    sql = "INSERT INTO _events VALUES (NULL, NULL, NULL, NULL, NULL, %s, NULL, 1, NOW()" % (Q1)
+
+# Save Data into DB Table
+    try:
+        cursor.execute(sql, msg_dict.values())
+    except mariadb.Error as error:
+        print("Error: {}".format(error))
+    mariadb_connection.commit()
+
+    
 def on_subscribe(mosq, obj, mid, granted_qos):
   pass
 
