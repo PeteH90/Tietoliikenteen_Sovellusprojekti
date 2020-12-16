@@ -19,8 +19,8 @@ pressure = round(pressure,1)
 pressure = str(pressure)
 temperature = str(ambient_temperature)
 
-broker_address="mqtt.eclipse.org"
+broker_address="broker.hivemq.com"
 client = mqtt.Client("P1")
 client.connect(broker_address)
-client.publish("paavo_cabin_temperature_outside","1"+temperature)
+#client.publish("paavo_cabin_temperature_outside","1"+temperature)
 client.publish("paavo_cabin_airpressure","4"+pressure)
