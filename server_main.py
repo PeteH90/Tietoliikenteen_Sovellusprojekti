@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import ssl
 import mysql.connector as mariadb
 
-mariadb_connection = mariadb.connect(user='testi1', password='!Anturidata123', database='cabin_monitor')
+mariadb_connection = mariadb.connect(user='', password='', database='cabin_monitor')
 cursor = mariadb_connection.cursor()
 
 # MQTT Settings
