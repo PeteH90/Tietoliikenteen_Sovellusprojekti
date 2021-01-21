@@ -6,4 +6,6 @@ Petri Hautamäki
 Juuso Puolakka
 Paavo Määttä
 
-http://13.53.201.73/~ubuntu/wordpress/
+
+Posterista löytyy projektin kuvaus.
+Cabin Monitor nettisivu: http://13.53.201.73/~ubuntu/wordpress/
